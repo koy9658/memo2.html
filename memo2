@@ -1,0 +1,247 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>something</title>
+  <style>
+  body{
+  color:#34495e;
+  background-color:#ecf0f1;
+}
+.btn{
+  cursor:pointer;
+}
+ul>li{
+  color:#ffffff;
+  text-align:center;
+  list-style:none;
+}
+.button
+{
+  background: transparent;
+}
+.clicked{
+  color:#7f8c8d;
+}
+.form,.greetings{
+  display:none;
+}
+.showing{
+  display:block;
+}
+h4,form
+{
+  font-size:30px;
+  text-align: center;
+  color:#ffffff
+}
+#name{
+  width:300px;
+  height:30px;
+}
+.js_clock{
+  font-size: 80px;
+  text-align: center;
+  color:white;
+  top-margin:0;
+}
+.write
+{
+  background-color:white;
+  border:none;
+  background: transparent;
+  color:white;
+  border-bottom:3px solid white;
+}
+input::placeholder
+{
+  color:white;
+  font-size:20px;
+  text-align:center;
+}
+@keyframes fadeIn{
+  from{
+    opacity:0;
+  }to{
+    opacity:1;
+  }
+}
+.backgroundimg{
+  position: absolute;
+  top:0;
+  left:0;
+  width:150%;
+  z-index:-1;
+  animation: fadeIn 0.5s linear;
+  </style>
+  <meta charset="utf-8">
+</head>
+<body>
+
+  <div class="js_clock">
+    <h1></h1>
+  </div>
+
+  <form class="js_form form">
+    <input class="write" id ="name"type="text" placeholder="what is your name?"/>
+  </form>
+
+  <h4 class="js_username username"></h4>
+
+  <form class="js_todoform">
+    <input class = "write"type="text" placeholder="Memo"/>
+  </form>
+
+  <ul class="js_todolist">
+
+  </ul>
+
+  <script>
+  onst clockContainer = document.querySelector("h1");
+function getTime(){
+  const date = new Date();
+  const hours = date.getHours();
+  const minutes = date.getMinutes();
+  const seconds = date.getSeconds();
+  clockContainer.innerText =
+   `${hours < 10 ? `0${hours}` : hours}:${
+    minutes < 10 ? `0${minutes}` : minutes}:${
+    seconds < 10 ? `0${seconds}` : seconds}`;
+}
+
+function init(){
+  getTime();
+  setInterval(getTime,1000);
+}
+init();
+const todoform = document.querySelector(".js_todoform");
+const todoinput = todoform.querySelector("input");
+const todolist = document.querySelector(".js_todolist");
+const todo_ls = 'todos';
+let todoArr = [];
+
+
+function deletetodo(event){
+  const btn = event.target;
+  const li = btn.parentNode;
+  todolist.removeChild(li);
+  const cleantodo = todoArr.filter(function(todo){
+    return todo.id !== parseInt(li.id);
+  });
+  todoArr = cleantodo
+  savelist();
+}
+
+function savelist(){
+  localStorage.setItem(todo_ls,JSON.stringify(todoArr));
+}
+
+function painttodo(text){
+  const li=document.createElement("li");
+  const delbtn = document.createElement("button");
+  const span = document.createElement("span");
+  const newid = todoArr.length+1;
+  delbtn.innerText = "x";
+  delbtn.addEventListener("click",deletetodo);
+  span.innerText = text;
+  li.appendChild(delbtn);
+  li.appendChild(span);
+  todolist.appendChild(li);
+
+  li.id = newid;
+  const todoobj = {
+    text:text,
+    id:newid
+  };
+  todoArr.push(todoobj);
+  savelist();
+}
+
+function handlesubmit(event)
+{
+  event.preventDefault();
+  const currentvalue = todoinput.value;
+  painttodo(currentvalue);
+  todoinput.value="";
+}
+
+function loadtodo(){
+  const loadedtodo = localStorage.getItem(todo_ls);
+  if (loadedtodo !== null){
+    const parsedtodos = JSON.parse(loadedtodo);
+    parsedtodos.forEach(function(todo){
+      painttodo(todo.text);
+    });
+  }
+}
+
+function init(){
+  loadtodo();
+  todoform.addEventListener("submit",handlesubmit);
+}
+const usernameform = document.querySelector(".js_form");
+const usernameinput = usernameform.querySelector("input");
+const username = document.querySelector(".js_username");
+const USER_LS ="currentUser";
+const SHOWING_CN = "showing";
+
+function saveName(text){
+  localStorage.setItem(USER_LS,text);
+}
+
+function handleSubmit(event)
+{
+  event.preventDefault();
+  const currentValue = usernameinput.value;
+  paintGreeting(currentValue);
+  saveName(currentValue);
+}
+
+function askForName(){
+  usernameform.classList.add(SHOWING_CN);
+  usernameform.addEventListener("submit",handleSubmit);
+}
+
+function paintGreeting(text){
+  usernameform.classList.remove(SHOWING_CN);
+  username.classList.add(SHOWING_CN);
+  username.innerText = `안녕하세요 ${text}님`;
+}
+
+function loadName()
+{
+    const currentUser = localStorage.getItem(USER_LS);
+    if (currentUser === null){
+      askForName();
+    }else{
+      paintGreeting(currentUser);
+    }
+}
+
+function init()
+{
+  loadName();
+}
+const body = document.querySelector("body");
+const img_num = 3;
+
+
+function paintimage(img_num){
+  const image = new Image();
+  image.src = `1.jpg`;
+  image.classList.add("backgroundimg");
+  body.prepend(image);
+}
+
+function genRandom()
+{
+  const number = Math.floor(Math.random()*img_num);
+  return number;
+}
+
+function init(){
+  const randomNumber = genRandom();
+  paintimage(randomNumber);
+}
+
+</body>
+</html>
